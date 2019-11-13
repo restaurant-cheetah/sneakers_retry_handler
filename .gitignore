@@ -2,4 +2,5 @@
 *.rbc
 /.config
 /tmp/
+/log/
 build/
