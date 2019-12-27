@@ -84,7 +84,6 @@ module Sneakers
             error: reason.to_s,
             num_attempts: num_attempts,
             failed_at: Time.now.iso8601,
-            properties: props
           }.tap do |hash|
             if reason.is_a?(Exception)
               hash[:error_class] = reason.class.to_s
@@ -95,14 +94,7 @@ module Sneakers
             end
           end
 
-          data =
-            begin
-              JSON.parse(msg).merge(error_data: error_data).to_json
-            rescue
-              error_data.merge(payload: msg).to_json
-            end
-
-          @error_exchange.publish(data, routing_key: hdr.routing_key)
+          @error_exchange.publish(msg, routing_key: hdr.routing_key, headers: { error_data: error_data })
           @channel.acknowledge(hdr.delivery_tag, false)
         end
       end
