@@ -5,17 +5,11 @@ module Sneakers
     class DelayedRetry
       def initialize(channel, queue, opts)
         @worker_queue_name = queue.name
-        Sneakers.logger.debug do
-          "#{log_prefix} creating handler, opts=#{opts}"
-        end
 
         @channel = channel
         @opts = opts
 
         error_exchange_name = @opts[:error_exchange_name] || 'error_exchange'
-        Sneakers.logger.debug do
-          "#{log_prefix} creating exchange=#{error_exchange_name}"
-        end
         @error_exchange = @channel.exchange(
           error_exchange_name,
           type: 'direct',
@@ -23,9 +17,6 @@ module Sneakers
         )
 
         error_queue_name = @opts[:error_queue_name] || "error.#{@worker_queue_name}"
-        Sneakers.logger.debug do
-          "#{log_prefix} creating queue=#{error_queue_name}"
-        end
         error_queue = @channel.queue(
           error_queue_name,
           durable: queue_durable?
@@ -64,9 +55,6 @@ module Sneakers
         num_attempts = failure_count(props[:headers]) + 1
 
         if (num_attempts <= @max_retries) && retriable_on?(reason)
-          Sneakers.logger.info do
-            "#{log_prefix} msg=retrying, count=#{num_attempts}, headers=#{props[:headers]}"
-          end
 
           sleep(@sleep_before_retry)
 
@@ -74,10 +62,6 @@ module Sneakers
 
           @channel.reject(hdr.delivery_tag, false)
         else
-          Sneakers.logger.info do
-            "#{log_prefix} msg=failing, retry_count=#{num_attempts}, reason=#{reason}"
-          end
-
           @on_error.call(reason, msg, num_attempts)
 
           error_data = {
@@ -116,10 +100,6 @@ module Sneakers
             x_death_array.count
           end
         end
-      end
-
-      def log_prefix
-        "DelayedRetry handler [queue=#{@worker_queue_name}]"
       end
 
       def queue_durable?
