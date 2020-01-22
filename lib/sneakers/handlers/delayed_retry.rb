@@ -70,7 +70,7 @@ module Sneakers
 
           sleep(@sleep_before_retry)
 
-          @on_retry.call(reason, msg, num_attempts)
+          @on_retry.call(reason, msg, num_attempts) rescue nil
 
           @channel.reject(hdr.delivery_tag, false)
         else
@@ -78,7 +78,7 @@ module Sneakers
             "#{log_prefix} msg=failing, retry_count=#{num_attempts}, reason=#{reason}"
           end
 
-          @on_error.call(reason, msg, num_attempts)
+          @on_error.call(reason, msg, num_attempts) rescue nil
 
           error_data = {
             error: reason.to_s,
