@@ -3,5 +3,5 @@
 require_relative 'sneakers/handlers/delayed_retry'
 
 module SneakersRetryHandler
-  VERSION = '0.2.1'
+  VERSION = '0.2.2'
 end
