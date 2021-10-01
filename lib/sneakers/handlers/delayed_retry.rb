@@ -81,15 +81,15 @@ module Sneakers
           @on_error.call(reason, msg, num_attempts) rescue nil
 
           error_data = {
-            error: reason.to_s,
+            error: reason.to_s.encode(Encoding::UTF_8),
             num_attempts: num_attempts,
             failed_at: Time.now.iso8601,
           }.tap do |hash|
             if reason.is_a?(Exception)
-              hash[:error_class] = reason.class.to_s
-              hash[:error_message] = reason.to_s
+              hash[:error_class] = reason.class.to_s.encode(Encoding::UTF_8)
+              hash[:error_message] = reason.to_s.encode(Encoding::UTF_8)
               if reason.backtrace
-                hash[:backtrace] = reason.backtrace.take(10).join(', ').force_encoding(Encoding::UTF_8)
+                hash[:backtrace] = reason.backtrace.take(10).join(', ').encode(Encoding::UTF_8)
               end
             end
           end
