@@ -89,7 +89,7 @@ module Sneakers
               hash[:error_class] = reason.class.to_s
               hash[:error_message] = reason.to_s
               if reason.backtrace
-                hash[:backtrace] = reason.backtrace.take(10).join(', ')
+                hash[:backtrace] = reason.backtrace.take(10).join(', ').force_encoding(Encoding::UTF_8)
               end
             end
           end
